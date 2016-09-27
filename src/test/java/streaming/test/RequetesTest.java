@@ -105,7 +105,7 @@ public class RequetesTest {
         
     }
     
-    @Test
+    //@Test
     public void test15(){
         
         EntityManager em=Persistence.createEntityManagerFactory("PU").createEntityManager();
@@ -113,12 +113,107 @@ public class RequetesTest {
         
         
         System.out.println(l.getTitre());
-        
+        Assert.assertEquals("Le bal des vampires", l.getTitre());
         
     }
     
+    //@Test
+    public void test17(){
+        EntityManager em=Persistence.createEntityManagerFactory("PU").createEntityManager();
+        long l= (long) em.createQuery("SELECT COUNT(f) FROM Film f JOIN f.realisateurs r WHERE r.nom='Coen' AND r.prenom='Joel'").getSingleResult();
+        Assert.assertEquals(2L, l);
+    }
     
+    //@Test
+    public void test19(){
+        EntityManager em=Persistence.createEntityManagerFactory("PU").createEntityManager();
+        long l= (long) em.createQuery("SELECT COUNT(f) FROM Film f JOIN f.realisateurs r WHERE r.nom='Coen'").getSingleResult();
+        Assert.assertEquals(4L, l);
+        
+    }
     
+    //@Test
+    public void test21(){
+        EntityManager em=Persistence.createEntityManagerFactory("PU").createEntityManager();
+        long l= (long) em.createQuery("SELECT COUNT(f) FROM Film f JOIN f.realisateurs r1 JOIN f.realisateurs r2 JOIN f.acteurs a  WHERE r1.nom='Coen' AND r1.prenom='Ethan' AND r2.prenom='Joel' AND a.nom='Buscemi'").getSingleResult();
+        Assert.assertEquals(2L, l);
+        
+    }
+    
+    //@Test
+    public void test23(){
+        EntityManager em=Persistence.createEntityManagerFactory("PU").createEntityManager();
+        long l= (long) em.createQuery("SELECT COUNT(f) FROM Film f JOIN f.realisateurs r JOIN f.acteurs a JOIN f.genre g WHERE r.nom='Coen' AND a.nom='Buscemi' AND g.nom='Policier'").getSingleResult();
+        Assert.assertEquals(2L, l);
+        
+    }
+    
+    //@Test
+    public void test25(){
+        EntityManager em=Persistence.createEntityManagerFactory("PU").createEntityManager();
+        long l = (long) em.createQuery("SELECT COUNT(s) FROM Saison s JOIN s.serie r WHERE r.titre='Dexter'").getSingleResult();
+        //s.serie.titre une autre facon sans la jointure
+        Assert.assertEquals(8L, l);
+    }
+    
+    //@Test
+    public void test27(){
+        EntityManager em=Persistence.createEntityManagerFactory("PU").createEntityManager();
+        long l = (long) em.createQuery("SELECT COUNT(e) FROM Episode e JOIN e.saison s JOIN s.serie r WHERE r.titre='Dexter' AND s.numSaison='8'").getSingleResult();
+        Assert.assertEquals(12L, l);//e.saison.serie.titre=dexter
+        
+    }
+    
+    //@Test
+    public void test29(){
+        EntityManager em=Persistence.createEntityManagerFactory("PU").createEntityManager();
+        long l = (long) em.createQuery("SELECT COUNT(e) FROM Episode e JOIN e.saison s JOIN s.serie r WHERE r.titre='Dexter'").getSingleResult();
+        Assert.assertEquals(96L, l);
+        
+    }
+    
+   // @Test
+    public void test31(){
+        EntityManager em=Persistence.createEntityManagerFactory("PU").createEntityManager();
+        long l = (long) em.createQuery("SELECT COUNT(l) FROM Lien l JOIN l.film f JOIN f.pays p JOIN f.genre g WHERE p.nom='USA' AND g.nom='Policier'").getSingleResult();
+        Assert.assertEquals(3L, l);
+        
+    }
+    
+    //@Test
+    public void test33(){
+        EntityManager em=Persistence.createEntityManagerFactory("PU").createEntityManager();
+        long l = (long) em.createQuery("SELECT COUNT(l) FROM Lien l JOIN l.film f JOIN f.acteurs a JOIN f.genre g WHERE a.nom='Polanski' AND g.nom='Horreur'").getSingleResult();
+        Assert.assertEquals(1L, l);
+        
+    }
+    
+   //@Test
+    public void test35(){
+        EntityManager em=Persistence.createEntityManagerFactory("PU").createEntityManager();
+        List<Film> l =(List<Film>) em.createQuery("SELECT COUNT(f) FROM Film f JOIN f.genre g WHERE g.nom='Horreur' EXCEPT SELECT COUNT(f) FROM Film f JOIN f.acteurs a WHERE a.nom='Polanski'").getResultList();
+        Assert.assertEquals(0L, l.size());
+        Assert.assertTrue(l.size()==0);
+        Assert.assertTrue(l.isEmpty());
+        
+    }
+    
+    //@Test
+    public void test37(){
+        EntityManager em=Persistence.createEntityManagerFactory("PU").createEntityManager();
+        //long l = (long) em.createQuery("SELECT COUNT(f) FROM Film f JOIN f.acteurs a WHERE a.nom='Polanski'").getSingleResult();
+        long l = (long) em.createQuery("SELECT COUNT(f) FROM Film f INTERSECT SELECT f FROM Film f JOIN f.acteurs a WHERE a.nom='Polanski'").getSingleResult();
+        Assert.assertEquals(1L, l);
+        
+    }
+    
+    //@Test
+    public void test39(){
+        EntityManager em=Persistence.createEntityManagerFactory("PU").createEntityManager();
+        List<Film> l = (List<Film>) em.createQuery("SELECT (f) FROM Film f JOIN f.genre g WHERE g.nom='Horreur' UNION SELECT f FROM Film f JOIN f.acteurs a WHERE a.nom='Polanski'").getResultList();
+        Assert.assertEquals(1L, l.size());
+    }
+     
     
 }
 
